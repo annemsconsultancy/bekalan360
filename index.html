@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bekalan360</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --bg:#F5F8F4;
+    --surface:#FFFFFF;
+    --surface-2:#EEF2EC;
+    --surface-3:#E3EAE1;
+    --border:#D7E0D4;
+    --text:#141A17;
+    --text-muted:#5C6B61;
+    --text-faint:#8B978E;
+    --accent:#0F6B5C;
+    --accent-strong:#0B4F44;
+    --accent-soft:#DDEEE8;
+    --gold:#A96A12;
+    --gold-soft:#F5E7CC;
+    --success:#2F8F5B;
+    --success-soft:#DEF3E6;
+    --warning:#A96A12;
+    --warning-soft:#F5E7CC;
+    --critical:#B23B32;
+    --critical-soft:#F8DEDB;
+    --shadow:0 1px 2px rgba(20,26,23,.06),0 6px 16px rgba(20,26,23,.06);
+    --radius:12px;
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0D1311;
+      --surface:#141C19;
+      --surface-2:#1A2420;
+      --surface-3:#213028;
+      --border:#293A32;
+      --text:#E8EFEA;
+      --text-muted:#93A79C;
+      --text-faint:#68796F;
+      --accent:#49D6B4;
+      --accent-strong:#7CEBCF;
+      --accent-soft:#153A32;
+      --gold:#E0A64A;
+      --gold-soft:#3A2C15;
+      --success:#5FCB8E;
+      --success-soft:#153524;
+      --warning:#E0A64A;
+      --warning-soft:#3A2C15;
+      --critical:#E8776C;
+      --critical-soft:#3B1E1A;
+      --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 24px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0D1311;
+    --surface:#141C19;
+    --surface-2:#1A2420;
+    --surface-3:#213028;
+    --border:#293A32;
+    --text:#E8EFEA;
+    --text-muted:#93A79C;
+    --text-faint:#68796F;
+    --accent:#49D6B4;
+    --accent-strong:#7CEBCF;
+    --accent-soft:#153A32;
+    --gold:#E0A64A;
+    --gold-soft:#3A2C15;
+    --success:#5FCB8E;
+    --success-soft:#153524;
+    --warning:#E0A64A;
+    --warning-soft:#3A2C15;
+    --critical:#E8776C;
+    --critical-soft:#3B1E1A;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 24px rgba(0,0,0,.4);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+    font-size:14px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{font-family:"IBM Plex Sans",sans-serif;font-weight:600;margin:0;text-wrap:balance;}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace;}
+  table{font-variant-numeric:tabular-nums;}
+  ::selection{background:var(--accent-soft);}
+
+  button{font-family:inherit;}
+  a{color:var(--accent-strong);}
+  input,select,textarea{font-family:inherit;font-size:13.5px;}
+
+  /* ---------- App shell ---------- */
+  .app-shell{display:flex;min-height:100vh;}
+
+  .sidebar{
+    width:236px;flex-shrink:0;background:var(--surface);
+    border-right:1px solid var(--border);
+    display:flex;flex-direction:column;
+    position:sticky;top:0;height:100vh;overflow-y:auto;
+  }
+  .brand{
+    display:flex;align-items:center;gap:10px;
+    padding:20px 20px 16px;
+  }
+  .brand-mark{
+    width:32px;height:32px;border-radius:9px;background:var(--accent);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .brand-mark svg{width:18px;height:18px;stroke:#fff;}
+  .brand-name{font-weight:700;font-size:15.5px;letter-spacing:-.01em;}
+  .brand-tag{font-size:11px;color:var(--text-faint);margin-top:1px;}
+
+  .nav-scroll{flex:1;padding:6px 12px 16px;}
+  .nav-group{margin-top:16px;}
+  .nav-group:first-child{margin-top:4px;}
+  .nav-label{
+    font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--text-faint);padding:0 10px 6px;
+  }
+  .nav-item{
+    display:flex;align-items:center;gap:10px;
+    padding:8px 10px;border-radius:8px;
+    color:var(--text-muted);font-size:13.5px;font-weight:500;
+    cursor:pointer;border:none;background:none;width:100%;text-align:left;
+  }
+  .nav-item svg{width:16px;height:16px;stroke:currentColor;flex-shrink:0;}
+  .nav-item:hover{background:var(--surface-2);color:var(--text);}
+  .nav-item.active{background:var(--accent-soft);color:var(--accent-strong);}
+  .nav-item .count{
+    margin-left:auto;font-size:11px;font-family:"IBM Plex Mono",monospace;
+    color:var(--text-faint);background:var(--surface-2);border-radius:999px;
+    padding:1px 6px;
+  }
+  .nav-item.active .count{color:var(--accent-strong);background:var(--surface);}
+
+  .sidebar-foot{padding:12px 20px 18px;border-top:1px solid var(--border);}
+  .sidebar-foot button{
+    width:100%;font-size:12px;color:var(--text-faint);background:none;border:1px dashed var(--border);
+    border-radius:8px;padding:8px;cursor:pointer;
+  }
+  .sidebar-foot button:hover{color:var(--text);border-color:var(--text-faint);}
+
+  .main{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .topbar{
+    height:60px;flex-shrink:0;display:flex;align-items:center;gap:16px;
+    padding:0 28px;border-bottom:1px solid var(--border);background:var(--surface);
+    position:sticky;top:0;z-index:5;
+  }
+  .topbar h1{font-size:17px;}
+  .topbar .sub{font-size:12px;color:var(--text-faint);margin-top:1px;}
+  .topbar-search{
+    margin-left:auto;display:flex;align-items:center;gap:8px;
+    background:var(--surface-2);border:1px solid var(--border);border-radius:9px;
+    padding:7px 12px;width:260px;max-width:40vw;
+  }
+  .topbar-search svg{width:15px;height:15px;stroke:var(--text-faint);flex-shrink:0;}
+  .topbar-search input{background:none;border:none;outline:none;color:var(--text);width:100%;}
+  .topbar-search input::placeholder{color:var(--text-faint);}
+
+  .content{padding:24px 24px 70px;max-width:1360px;width:100%;margin:0 auto;}
+  .page{display:none;}
+  .page.active{display:block;animation:fadein .18s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(3px);}to{opacity:1;transform:none;}}
+  @media (prefers-reduced-motion: reduce){ .page.active{animation:none;} }
+
+  .banner{
+    display:flex;align-items:flex-start;gap:10px;
+    background:var(--gold-soft);border:1px solid var(--gold);color:var(--gold);
+    border-radius:10px;padding:11px 14px;margin-bottom:22px;font-size:12.5px;
+  }
+  .banner strong{color:inherit;}
+  .banner svg{width:16px;height:16px;flex-shrink:0;margin-top:1px;stroke:currentColor;}
+  .banner button{margin-left:auto;background:none;border:none;color:inherit;cursor:pointer;opacity:.7;font-size:16px;line-height:1;padding:0 2px;}
+  .banner button:hover{opacity:1;}
+
+  .page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap;}
+  .page-head h2{font-size:20px;letter-spacing:-.01em;}
+  .page-head p{margin:4px 0 0;color:var(--text-muted);font-size:13px;max-width:60ch;}
+  .page-actions{display:flex;gap:8px;flex-shrink:0;}
+
+  .btn{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:13px;font-weight:600;border-radius:8px;padding:8px 14px;
+    cursor:pointer;border:1px solid transparent;white-space:nowrap;
+  }
+  .btn svg{width:14px;height:14px;stroke:currentColor;}
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-primary:hover{background:var(--accent-strong);}
+  .btn-secondary{background:var(--surface);border-color:var(--border);color:var(--text);}
+  .btn-secondary:hover{border-color:var(--text-faint);}
+  .btn-ghost{background:none;border:none;color:var(--text-muted);padding:6px 8px;}
+  .btn-ghost:hover{color:var(--text);}
+  .btn-danger{color:var(--critical);}
+  .btn:focus-visible,.nav-item:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+    outline:2px solid var(--accent);outline-offset:1px;
+  }
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);}
+  .card-pad{padding:20px;}
+
+  /* KPI tiles */
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px;}
+  .tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);}
+  .tile-label{font-size:11.5px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
+  .tile-value{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;margin-top:8px;letter-spacing:-.02em;}
+  .tile-foot{margin-top:6px;font-size:12px;color:var(--text-faint);}
+
+  .grid-2{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;}
+  @media (max-width:920px){.grid-2{grid-template-columns:1fr;}}
+
+  .section-title{font-size:13px;font-weight:600;padding:16px 20px 4px;color:var(--text);}
+  .section-sub{font-size:12px;color:var(--text-faint);padding:0 20px 12px;}
+
+  .alert-row{display:flex;align-items:center;gap:10px;padding:10px 20px;border-top:1px solid var(--border);font-size:13px;}
+  .alert-row:first-of-type{border-top:none;}
+  .alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .alert-count{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-weight:600;}
+
+  /* tables */
+  .table-toolbar{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--border);}
+  .table-search{
+    display:flex;align-items:center;gap:7px;background:var(--surface-2);border:1px solid var(--border);
+    border-radius:8px;padding:6px 10px;flex:1;max-width:280px;
+  }
+  .table-search svg{width:14px;height:14px;stroke:var(--text-faint);flex-shrink:0;}
+  .table-search input{background:none;border:none;outline:none;width:100%;color:var(--text);}
+  .table-meta{margin-left:auto;font-size:12px;color:var(--text-faint);}
+  .table-wrap{overflow-x:auto;}
+  table.data{width:100%;border-collapse:collapse;}
+  table.data th{
+    text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;
+    color:var(--text-faint);padding:9px 11px;border-bottom:1px solid var(--border);
+    white-space:nowrap;font-weight:600;
+  }
+  table.data td{padding:9px 11px;border-bottom:1px solid var(--border);font-size:12.8px;white-space:nowrap;}
+  table.data td.wrap{white-space:normal;}
+  table.data tbody tr:hover td{background:var(--surface-2);}
+  table.data tbody tr:last-child td{border-bottom:none;}
+  .cell-muted{color:var(--text-faint);}
+  .row-actions{display:flex;gap:4px;}
+  .row-actions button{
+    width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:var(--surface);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-muted);
+  }
+  .row-actions button:hover{color:var(--text);border-color:var(--text-faint);}
+  .row-actions svg{width:13px;height:13px;stroke:currentColor;}
+  .empty-state{padding:36px 20px;text-align:center;color:var(--text-faint);font-size:13px;}
+
+  .pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:600;white-space:nowrap;}
+  .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;}
+  .pill-success{background:var(--success-soft);color:var(--success);}
+  .pill-warning{background:var(--warning-soft);color:var(--warning);}
+  .pill-critical{background:var(--critical-soft);color:var(--critical);}
+  .pill-neutral{background:var(--surface-3);color:var(--text-muted);}
+
+  /* modal */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(10,14,12,.45);display:none;
+    align-items:center;justify-content:center;z-index:50;padding:20px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:var(--surface);border-radius:14px;width:560px;max-width:100%;
+    max-height:88vh;overflow-y:auto;box-shadow:var(--shadow);
+  }
+  .modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);}
+  .modal-head h3{font-size:15.5px;}
+  .modal-head button{background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:18px;line-height:1;}
+  .modal-body{padding:20px 22px;display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .modal-body .full{grid-column:1/-1;}
+  .field label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:5px;}
+  .field input,.field select,.field textarea{
+    width:100%;padding:8px 10px;border-radius:7px;border:1px solid var(--border);
+    background:var(--bg);color:var(--text);
+  }
+  .field textarea{resize:vertical;min-height:56px;}
+  .modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 22px;border-top:1px solid var(--border);}
+
+  /* Supplier lookup */
+  .lookup-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px;}
+  .lookup-head select{padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13.5px;min-width:280px;}
+  .profile-card{display:flex;gap:16px;align-items:flex-start;}
+  .avatar{
+    width:52px;height:52px;border-radius:12px;background:var(--accent-soft);color:var(--accent-strong);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex-shrink:0;
+  }
+  .kv-list{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;margin-top:14px;}
+  .kv-list .kv{display:flex;flex-direction:column;gap:2px;}
+  .kv .k{font-size:11px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.04em;}
+  .kv .v{font-size:13.5px;font-weight:500;}
+
+  .score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;}
+  .score-item{background:var(--surface-2);border-radius:9px;padding:10px 12px;}
+  .score-item .lbl{font-size:11px;color:var(--text-faint);}
+  .score-item .val{font-family:"IBM Plex Mono",monospace;font-size:17px;font-weight:600;margin-top:3px;}
+  .score-item .wt{font-size:10.5px;color:var(--text-faint);}
+
+  .rating-hero{display:flex;align-items:center;gap:18px;padding:16px 0 4px;}
+  .rating-ring{
+    width:78px;height:78px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:17px;
+  }
+
+  .subnav{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+  .subnav button{
+    font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:999px;
+    border:1px solid var(--border);background:var(--surface);color:var(--text-muted);cursor:pointer;
+  }
+  .subnav button.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+  .devnote{font-size:13px;color:var(--text-muted);}
+  .devnote h4{font-size:13.5px;color:var(--text);margin:22px 0 8px;}
+  .devnote h4:first-child{margin-top:0;}
+  .devnote code{font-family:"IBM Plex Mono",monospace;background:var(--surface-2);padding:1px 6px;border-radius:5px;font-size:12px;color:var(--accent-strong);}
+  .schema-table{width:100%;border-collapse:collapse;margin-top:8px;}
+  .schema-table th{text-align:left;font-size:11px;color:var(--text-faint);text-transform:uppercase;padding:6px 10px;border-bottom:1px solid var(--border);}
+  .schema-table td{padding:6px 10px;border-bottom:1px solid var(--border);font-size:12.5px;vertical-align:top;}
+
+  .toast{
+    position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
+    background:var(--text);color:var(--bg);padding:10px 18px;border-radius:9px;
+    font-size:13px;font-weight:500;box-shadow:var(--shadow);z-index:80;
+    opacity:0;pointer-events:none;transition:opacity .2s ease, transform .2s ease;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
+
+  @media (max-width:760px){
+    .sidebar{position:fixed;left:-260px;z-index:40;transition:left .2s ease;box-shadow:var(--shadow);}
+    .sidebar.open{left:0;}
+    .content{padding:20px 16px 60px;}
+    .modal-body{grid-template-columns:1fr;}
+    .kv-list{grid-template-columns:1fr;}
+    .score-grid{grid-template-columns:repeat(2,1fr);}
+  }
+</style>
+</head>
+<body>
+
+
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l9-5 9 5-9 5-9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">Bekalan360</div>
+        <div class="brand-tag">Prototaip sistem operasi</div>
+      </div>
+    </div>
+    <nav class="nav-scroll" id="navScroll"></nav>
+    <div class="sidebar-foot">
+      <button id="resetDemoBtn" type="button">Reset ke data contoh</button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <h1 id="pageTitle">Dashboard</h1>
+        <div class="sub" id="pageSubtitle">Ringkasan operasi hari ini</div>
+      </div>
+      <div class="topbar-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" id="quickSearch" placeholder="Cari supplier, PO, produk...">
+      </div>
+    </header>
+
+    <main class="content" id="content">
+      <!-- pages injected by JS -->
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modalTitle">Tambah Rekod</h3>
+      <button type="button" id="modalClose" aria-label="Tutup">&times;</button>
+    </div>
+    <form id="modalForm">
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-secondary" id="modalCancel">Batal</button>
+        <button type="submit" class="btn btn-primary">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   Bekalan360 — prototaip front-end. Data disimpan dalam memori + localStorage
+   (demo sahaja). Untuk software sebenar: setiap objek dalam SEED di bawah
+   = satu jadual database; lihat halaman "Nota Developer" dalam app.
+   ===================================================================== */
+"use strict";
+
+const STORAGE_KEY = "bekalan360_v1";
+
+const ICON = {
+  dashboard: '<path d="M4 4h7v7H4z"/><path d="M13 4h7v4h-7z"/><path d="M13 11h7v9h-7z"/><path d="M4 14h7v6H4z"/>',
+  supplier: '<path d="M3 21V9l9-5 9 5v12"/><path d="M9 21v-6h6v6"/><path d="M9 9h.01M15 9h.01M12 9h.01"/>',
+  tag: '<path d="M12 2l9 9-9 9-9-9V4a2 2 0 0 1 2-2h7z"/><circle cx="8" cy="8" r="1.4"/>',
+  doc: '<path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/>',
+  gauge: '<path d="M12 21a9 9 0 1 1 9-9"/><path d="M12 12l4-4"/><path d="M12 21v-2"/>',
+  clipboard: '<path d="M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1z"/><path d="M6 6h12v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V6z"/><path d="M9 12h6M9 16h6"/>',
+  box: '<path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v9l9 5 9-5V8"/><path d="M12 13v9"/>',
+  truck: '<path d="M3 6h11v10H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="18" cy="18" r="1.6"/>',
+  user: '<circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.5 3.1-6 7-6s7 2.5 7 6"/>',
+  cart: '<circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/><path d="M3 4h2l2.2 11h9.6L19 8H6.2"/>',
+  arrowDown: '<circle cx="12" cy="12" r="9"/><path d="M12 7v7M9 11l3 3 3-3"/>',
+  arrowUp: '<circle cx="12" cy="12" r="9"/><path d="M12 17v-7M9 13l3-3 3 3"/>',
+  chart: '<path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2 20h20"/>',
+  search360: '<circle cx="10" cy="10" r="6.5"/><path d="M20 20l-5.2-5.2"/><path d="M7.5 10a2.5 2.5 0 0 1 2.5-2.5"/>',
+  globe: '<circle cx="11" cy="11" r="7.5"/><path d="M11 3.5c2.2 2 3.4 4.8 3.4 7.5s-1.2 5.5-3.4 7.5M11 3.5c-2.2 2-3.4 4.8-3.4 7.5s1.2 5.5 3.4 7.5M3.6 11h14.8"/><path d="M20.5 20.5L17 17"/>',
+  code: '<path d="M8 6L3 12l5 6M16 6l5 6-5 6M13.5 4l-3 16"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  edit: '<path d="M4 17.5V20h2.5L18 8.5 15.5 6 4 17.5z"/><path d="M13.5 8L16 10.5"/>',
+  trash: '<path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/>',
+};
+function icon(name, cls){
+  return `<svg class="${cls||""}" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICON[name]||""}</svg>`;
+}
+
+/* ---------------- Utility ---------------- */
+function fmtMoney(n){
+  n = Number(n)||0;
+  return "RM " + n.toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function fmtDate(iso){
+  if(!iso) return "—";
+  const d = new Date(iso+"T00:00:00");
+  if(isNaN(d)) return iso;
+  return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear();
+}
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function daysBetween(a,b){ return Math.round((new Date(b)-new Date(a))/86400000); }
+function quarterOf(iso){
+  const d = new Date(iso+"T00:00:00");
+  return {y:d.getFullYear(), q:Math.floor(d.getMonth()/3)+1};
+}
+function uid(prefix, list, pad){
+  let n = list.length+1;
+  let id;
+  do{ id = prefix+"-"+String(n).padStart(pad||3,"0"); n++; } while(list.some(r=>r.id===id));
+  return id;
+}
+function escapeHtml(s){
+  return String(s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toast._h);
+  toast._h = setTimeout(()=>t.classList.remove("show"), 2200);
+}
+</script>
+<script>
+/* ---------------- Seed data (contoh untuk demo) ---------------- */
+function seedData(){
+  return {
+    suppliers: [
+      {id:"SUP-001", name:"Ladang Ayam Sejahtera Sdn Bhd", category:"Ayam Segar", contact:"Encik Razak", phone:"012-3456789", email:"razak@ladangsejahtera.com.my", address:"Lot 12, Jalan Industri 3, Kajang, Selangor", status:"Active", onboarded:"2024-01-15"},
+      {id:"SUP-002", name:"Sumber Protein Enterprise", category:"Ayam Beku", contact:"Puan Aina", phone:"013-2223344", email:"aina@sumberprotein.com", address:"No. 5, Kawasan Perindustrian Semenyih", status:"Active", onboarded:"2024-06-03"},
+      {id:"SUP-003", name:"Ternak Makmur Trading", category:"Telur & Ayam", contact:"Encik Hafiz", phone:"019-8871122", email:"hafiz@ternakmakmur.my", address:"Batu 8, Jalan Semenyih-Kajang", status:"Active", onboarded:"2025-02-10"},
+    ],
+    priceList: [
+      {id:"PL-001", supplier:"Ladang Ayam Sejahtera Sdn Bhd", product:"Ayam Standard (Whole)", unit:"kg", price:8.50, moq:500, leadTime:1, maxCap:3000, remarks:"Bekalan harian"},
+      {id:"PL-002", supplier:"Ladang Ayam Sejahtera Sdn Bhd", product:"Ayam Kampung (Whole)", unit:"kg", price:15.00, moq:100, leadTime:2, maxCap:800, remarks:""},
+      {id:"PL-003", supplier:"Sumber Protein Enterprise", product:"Ayam Beku (Cut Parts)", unit:"kg", price:9.80, moq:300, leadTime:3, maxCap:2000, remarks:"Simpanan sejuk beku"},
+      {id:"PL-004", supplier:"Ternak Makmur Trading", product:"Telur Gred A", unit:"tray (30 biji)", price:13.50, moq:50, leadTime:2, maxCap:500, remarks:""},
+    ],
+    agreements: [
+      {id:"AGR-001", supplier:"Ladang Ayam Sejahtera Sdn Bhd", type:"Supply Agreement", start:"2026-01-01", end:"2026-12-31", reminderDays:30, link:"https://drive.google.com/drive/folders/ladang-sejahtera", notes:"Perjanjian tahunan, harga tetap"},
+      {id:"AGR-002", supplier:"Sumber Protein Enterprise", type:"Price Agreement", start:"2025-09-01", end:"2026-09-28", reminderDays:30, link:"https://drive.google.com/drive/folders/sumber-protein", notes:"Semakan harga setiap 6 bulan"},
+      {id:"AGR-003", supplier:"Ternak Makmur Trading", type:"Supply Agreement", start:"2025-01-01", end:"2025-12-31", reminderDays:30, link:"https://drive.google.com/drive/folders/ternak-makmur", notes:"Belum diperbaharui"},
+    ],
+    kpi: [
+      {id:"KPI-001", supplier:"Ladang Ayam Sejahtera Sdn Bhd", year:2026, quarter:"Q2", quality:4, delivery:5, cost:3, service:4, compliance:5, reliability:4},
+      {id:"KPI-002", supplier:"Ladang Ayam Sejahtera Sdn Bhd", year:2026, quarter:"Q3", quality:4, delivery:5, cost:4, service:4, compliance:5, reliability:4},
+      {id:"KPI-003", supplier:"Sumber Protein Enterprise", year:2026, quarter:"Q3", quality:3, delivery:3, cost:3, service:3, compliance:4, reliability:3},
+      {id:"KPI-004", supplier:"Ternak Makmur Trading", year:2026, quarter:"Q2", quality:2, delivery:2, cost:3, service:2, compliance:3, reliability:2},
+      {id:"KPI-005", supplier:"Ternak Makmur Trading", year:2026, quarter:"Q3", quality:2, delivery:3, cost:2, service:2, compliance:3, reliability:2},
+    ],
+    po: [
+      {id:"PO-2026-001", supplier:"Ladang Ayam Sejahtera Sdn Bhd", date:"2026-07-05", product:"Ayam Standard (Whole)", qty:500, price:8.50, expected:"2026-07-12", actual:"2026-07-12", deliveryStatus:"Delivered", invoiceNo:"INV-8891", invoiceStatus:"Paid"},
+      {id:"PO-2026-002", supplier:"Sumber Protein Enterprise", date:"2026-08-20", product:"Ayam Beku (Cut Parts)", qty:300, price:9.80, expected:"2026-08-27", actual:"2026-08-28", deliveryStatus:"Delivered", invoiceNo:"INV-9012", invoiceStatus:"Invoiced"},
+      {id:"PO-2026-003", supplier:"Ladang Ayam Sejahtera Sdn Bhd", date:"2026-08-25", product:"Ayam Kampung (Whole)", qty:100, price:15.00, expected:"2026-08-30", actual:"2026-09-01", deliveryStatus:"Delivered", invoiceNo:"INV-9101", invoiceStatus:"Not Invoiced"},
+      {id:"PO-2026-004", supplier:"Ternak Makmur Trading", date:"2026-09-02", product:"Telur Gred A", qty:50, price:13.50, expected:"2026-09-08", actual:"", deliveryStatus:"Pending", invoiceNo:"", invoiceStatus:"Not Invoiced"},
+    ],
+    inventory: [
+      {id:"SKU-001", product:"Ayam Standard (Whole)", category:"Ayam Segar", unit:"kg", stock:850, reorder:300, warehouse:"Gudang A - Rak 1", updated:"2026-09-07", supplier:"Ladang Ayam Sejahtera Sdn Bhd"},
+      {id:"SKU-002", product:"Ayam Beku (Cut Parts)", category:"Ayam Beku", unit:"kg", stock:180, reorder:250, warehouse:"Gudang B - Freezer 2", updated:"2026-09-07", supplier:"Sumber Protein Enterprise"},
+      {id:"SKU-003", product:"Ayam Kampung (Whole)", category:"Ayam Segar", unit:"kg", stock:60, reorder:50, warehouse:"Gudang A - Rak 2", updated:"2026-09-07", supplier:"Ladang Ayam Sejahtera Sdn Bhd"},
+      {id:"SKU-004", product:"Telur Gred A", category:"Telur", unit:"tray", stock:40, reorder:60, warehouse:"Gudang C - Rak 1", updated:"2026-09-07", supplier:"Ternak Makmur Trading"},
+    ],
+    logistics: [
+      {id:"DO-2026-001", po:"PO-2026-001", date:"2026-07-12", vehicle:"Lori L1 (WXY 1234)", driver:"012-9998877", destination:"Gudang Utama - Kajang", status:"Delivered", tracking:"-", notes:"Hantar pagi"},
+      {id:"DO-2026-002", po:"PO-2026-002", date:"2026-08-28", vehicle:"Kurier Express-45", driver:"016-4432211", destination:"Gudang B - Semenyih", status:"Delivered", tracking:"EX4521190", notes:""},
+    ],
+    customers: [
+      {id:"CUST-001", name:"Pasaraya Segar Mart", contact:"Puan Lily", phone:"016-5551122", email:"lily@segarmart.my", address:"No. 8, Jalan Besar, Kajang", tier:"A", creditLimit:20000, status:"Active"},
+      {id:"CUST-002", name:"Restoran Nasi Ayam Bahagia", contact:"Encik Firdaus", phone:"017-7789900", email:"firdaus@nasiayambahagia.my", address:"45, Jalan Pasar, Semenyih", tier:"B", creditLimit:8000, status:"Active"},
+    ],
+    salesOrders: [
+      {id:"SO-2026-001", customer:"Pasaraya Segar Mart", date:"2026-08-10", product:"Ayam Standard (Whole)", qty:200, price:11.50, deliveryStatus:"Delivered", invoiceNo:"SINV-3301", invoiceStatus:"Paid"},
+      {id:"SO-2026-002", customer:"Restoran Nasi Ayam Bahagia", date:"2026-08-22", product:"Ayam Beku (Cut Parts)", qty:80, price:13.00, deliveryStatus:"Delivered", invoiceNo:"SINV-3340", invoiceStatus:"Invoiced"},
+      {id:"SO-2026-003", customer:"Pasaraya Segar Mart", date:"2026-09-01", product:"Telur Gred A", qty:20, price:16.00, deliveryStatus:"Pending", invoiceNo:"", invoiceStatus:"Not Invoiced"},
+    ],
+    ar: [
+      {id:"SINV-3301", customer:"Pasaraya Segar Mart", invoiceDate:"2026-08-10", dueDate:"2026-09-09", amount:2300.00, paid:2300.00},
+      {id:"SINV-3340", customer:"Restoran Nasi Ayam Bahagia", invoiceDate:"2026-08-22", dueDate:"2026-09-21", amount:1040.00, paid:0},
+      {id:"SINV-3299", customer:"Restoran Nasi Ayam Bahagia", invoiceDate:"2026-07-01", dueDate:"2026-07-31", amount:540.00, paid:0},
+    ],
+    ap: [
+      {id:"INV-8891", supplier:"Ladang Ayam Sejahtera Sdn Bhd", invoiceDate:"2026-07-12", dueDate:"2026-08-11", amount:4250.00, paid:4250.00},
+      {id:"INV-9012", supplier:"Sumber Protein Enterprise", invoiceDate:"2026-08-28", dueDate:"2026-09-27", amount:2940.00, paid:0},
+      {id:"INV-8850", supplier:"Ternak Makmur Trading", invoiceDate:"2026-07-15", dueDate:"2026-08-14", amount:675.00, paid:0},
+    ],
+    plExpenses: { "2026-Q2": 3500, "2026-Q3": 4200 },
+  };
+}
+
+let DB = null;
+function loadDB(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){ /* localStorage unavailable — fall back to fresh seed */ }
+  return seedData();
+}
+function saveDB(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(DB)); }catch(e){ /* ignore */ }
+}
+DB = loadDB();
+
+/* ---------------- Business logic (mirrors the Excel formulas 1:1) ---------------- */
+const WEIGHTS = {quality:.25, delivery:.20, cost:.15, service:.15, compliance:.15, reliability:.10};
+
+function kpiScore(rec){
+  const w = WEIGHTS;
+  const weighted = rec.quality*w.quality + rec.delivery*w.delivery + rec.cost*w.cost +
+                    rec.service*w.service + rec.compliance*w.compliance + rec.reliability*w.reliability;
+  return weighted/5; // 0..1
+}
+function classify(pct){
+  if(pct>=0.9) return {label:"Strategic / Preferred", action:"Increase business / Long Term Agreement", tone:"success"};
+  if(pct>=0.8) return {label:"Approved", action:"Maintain", tone:"success"};
+  if(pct>=0.7) return {label:"Conditional", action:"Improvement required", tone:"warning"};
+  if(pct>=0.6) return {label:"At Risk", action:"Corrective Action Plan", tone:"warning"};
+  return {label:"Poor / Disqualified", action:"Replace / Suspend", tone:"critical"};
+}
+function periodSort(rec){ return rec.year*10 + Number(rec.quarter.replace("Q","")); }
+function latestKpiFor(supplierName){
+  const rows = DB.kpi.filter(k=>k.supplier===supplierName);
+  if(!rows.length) return null;
+  rows.sort((a,b)=>periodSort(b)-periodSort(a));
+  return rows[0];
+}
+function supplierRating(supplierName){
+  const k = latestKpiFor(supplierName);
+  if(!k) return {period:null, pct:null, ...classify(0), label:"Belum Dinilai", tone:"neutral", action:"—"};
+  const pct = kpiScore(k);
+  const c = classify(pct);
+  return {period:k.quarter+"-"+k.year, pct, ...c};
+}
+function supplierPOs(supplierName){
+  return DB.po.filter(p=>p.supplier===supplierName).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+}
+function supplierStats(supplierName){
+  const pos = supplierPOs(supplierName);
+  const total = pos.reduce((s,p)=>s+p.qty*p.price,0);
+  const last = pos[0] || null;
+  return {
+    total,
+    lastDate: last?last.date:null,
+    lastAmount: last?last.qty*last.price:0,
+    count: pos.length,
+  };
+}
+function agreementStatus(rec){
+  const today = todayISO();
+  if(rec.end < today) return {label:"Expired", tone:"critical"};
+  const remindFrom = new Date(rec.end); remindFrom.setDate(remindFrom.getDate()-Number(rec.reminderDays||0));
+  if(new Date(today) >= remindFrom) return {label:"Expiring Soon", tone:"warning"};
+  return {label:"Active", tone:"success"};
+}
+function invStatus(rec){
+  return rec.stock<=rec.reorder ? {label:"LOW STOCK - REORDER", tone:"critical"} : {label:"OK", tone:"success"};
+}
+function invoiceAging(rec){
+  const balance = rec.amount - rec.paid;
+  if(balance<=0.004) return {balance:0, label:"Paid", tone:"success", overdue:0};
+  const today = todayISO();
+  if(rec.dueDate < today) return {balance, label:"Overdue", tone:"critical", overdue:daysBetween(rec.dueDate, today)};
+  return {balance, label:"Outstanding", tone:"warning", overdue:0};
+}
+function customerBalance(customerName){
+  return DB.ar.filter(r=>r.customer===customerName).reduce((s,r)=>s+invoiceAging(r).balance,0);
+}
+</script>
+<script>
+/* ---------------- Render helpers ---------------- */
+function pill(tone, label){ return `<span class="pill pill-${tone}">${escapeHtml(label)}</span>`; }
+function moneyCell(n){ return `<span class="mono">${fmtMoney(n)}</span>`; }
+
+const DYNAMIC_SOURCES = {
+  supplierNames: () => DB.suppliers.map(s=>s.name),
+  customerNames: () => DB.customers.map(c=>c.name),
+  poIds: () => DB.po.map(p=>p.id),
+};
+
+/* ---------------- Module registry ---------------- */
+const MODULES = {
+  suppliers: {
+    label:"Supplier Master", desc:"Senarai induk semua supplier.", icon:"supplier", group:"SUPPLIER",
+    dataKey:"suppliers", autoId:true, idPrefix:"SUP",
+    columns:[
+      {key:"id", label:"ID", mono:true},
+      {key:"name", label:"Nama Supplier"},
+      {key:"category", label:"Kategori"},
+      {key:"contact", label:"Contact Person"},
+      {key:"phone", label:"Telefon", mono:true},
+      {key:"status", label:"Status", render:r=>pill(r.status==="Active"?"success":"neutral", r.status)},
+      {key:"rating", label:"Rating Terkini", render:r=>{
+        const rt = supplierRating(r.name);
+        return rt.pct==null ? pill("neutral","Belum Dinilai") : pill(rt.tone, Math.round(rt.pct*100)+"% — "+rt.label);
+      }},
+    ],
+    searchKeys:["id","name","category","contact","phone","email","address"],
+    formFields:[
+      {key:"name", label:"Nama Supplier", type:"text", required:true, full:true},
+      {key:"category", label:"Kategori Barang", type:"text"},
+      {key:"contact", label:"Contact Person", type:"text"},
+      {key:"phone", label:"Telefon", type:"text"},
+      {key:"email", label:"Email", type:"text"},
+      {key:"address", label:"Alamat", type:"textarea", full:true},
+      {key:"status", label:"Status", type:"select", options:["Active","Inactive"], default:"Active"},
+      {key:"onboarded", label:"Tarikh Onboard", type:"date"},
+    ],
+  },
+  priceList: {
+    label:"Supplier Price List", desc:"Produk yang dibekalkan setiap supplier, kuantiti & harga.", icon:"tag", group:"SUPPLIER",
+    dataKey:"priceList", autoId:true, idPrefix:"PL",
+    columns:[
+      {key:"supplier", label:"Nama Supplier"},
+      {key:"product", label:"Produk"},
+      {key:"unit", label:"Unit"},
+      {key:"price", label:"Harga Unit", render:r=>moneyCell(r.price)},
+      {key:"moq", label:"MOQ"},
+      {key:"leadTime", label:"Lead Time (hari)"},
+      {key:"maxCap", label:"Kapasiti Maks"},
+    ],
+    searchKeys:["supplier","product","unit","remarks"],
+    formFields:[
+      {key:"supplier", label:"Nama Supplier", type:"select", dynamicSource:"supplierNames", required:true},
+      {key:"product", label:"Nama Produk", type:"text", required:true},
+      {key:"unit", label:"Unit", type:"text"},
+      {key:"price", label:"Harga Unit (RM)", type:"number", step:"0.01"},
+      {key:"moq", label:"MOQ", type:"number"},
+      {key:"leadTime", label:"Lead Time (hari)", type:"number"},
+      {key:"maxCap", label:"Kapasiti Maks/Order", type:"number"},
+      {key:"remarks", label:"Catatan", type:"text", full:true},
+    ],
+  },
+  agreements: {
+    label:"Supplier Agreements", desc:"Rekod perjanjian/kontrak & link ke dokumen sebenar.", icon:"doc", group:"SUPPLIER",
+    dataKey:"agreements", autoId:true, idPrefix:"AGR",
+    columns:[
+      {key:"id", label:"ID", mono:true},
+      {key:"supplier", label:"Nama Supplier"},
+      {key:"type", label:"Jenis"},
+      {key:"start", label:"Tarikh Mula", render:r=>fmtDate(r.start)},
+      {key:"end", label:"Tarikh Tamat", render:r=>fmtDate(r.end)},
+      {key:"status", label:"Status", render:r=>{const s=agreementStatus(r); return pill(s.tone,s.label);}},
+      {key:"link", label:"Fail", render:r=> r.link ? `<a href="${escapeHtml(r.link)}" target="_blank" rel="noopener">Buka link ↗</a>` : '<span class="cell-muted">—</span>'},
+    ],
+    searchKeys:["id","supplier","type","notes","link"],
+    formFields:[
+      {key:"supplier", label:"Nama Supplier", type:"select", dynamicSource:"supplierNames", required:true},
+      {key:"type", label:"Jenis Agreement", type:"select", options:["Supply Agreement","NDA","SLA","MOU","Price Agreement","Others"]},
+      {key:"start", label:"Tarikh Mula", type:"date"},
+      {key:"end", label:"Tarikh Tamat", type:"date"},
+      {key:"reminderDays", label:"Reminder (hari sblm tamat)", type:"number", default:30},
+      {key:"link", label:"Link/Path Fail (Google Drive/Local)", type:"text", full:true},
+      {key:"notes", label:"Catatan", type:"textarea", full:true},
+    ],
+  },
+  kpi: {
+    label:"Supplier KPI Scoring", desc:"Penilaian prestasi suku tahun — rating dikira automatik.", icon:"gauge", group:"SUPPLIER",
+    dataKey:"kpi", autoId:true, idPrefix:"KPI",
+    columns:[
+      {key:"supplier", label:"Nama Supplier"},
+      {key:"period", label:"Tempoh", render:r=>r.quarter+"-"+r.year},
+      {key:"quality", label:"Quality"}, {key:"delivery", label:"Delivery"}, {key:"cost", label:"Cost"},
+      {key:"service", label:"Service"}, {key:"compliance", label:"Compliance"}, {key:"reliability", label:"Reliability"},
+      {key:"pct", label:"Rating", render:r=>`<span class="mono">${Math.round(kpiScore(r)*100)}%</span>`},
+      {key:"class", label:"Klasifikasi", render:r=>{const c=classify(kpiScore(r)); return pill(c.tone,c.label);}},
+    ],
+    searchKeys:["supplier","quarter"],
+    formFields:[
+      {key:"supplier", label:"Nama Supplier", type:"select", dynamicSource:"supplierNames", required:true},
+      {key:"year", label:"Tahun", type:"number", default:new Date().getFullYear()},
+      {key:"quarter", label:"Suku (Quarter)", type:"select", options:["Q1","Q2","Q3","Q4"]},
+      {key:"quality", label:"Quality (25%)", type:"number", min:1, max:5, hint:"1=Poor … 5=Excellent"},
+      {key:"delivery", label:"Delivery (20%)", type:"number", min:1, max:5},
+      {key:"cost", label:"Cost (15%)", type:"number", min:1, max:5},
+      {key:"service", label:"Service (15%)", type:"number", min:1, max:5},
+      {key:"compliance", label:"Compliance (15%)", type:"number", min:1, max:5},
+      {key:"reliability", label:"Reliability (10%)", type:"number", min:1, max:5},
+    ],
+  },
+  po: {
+    label:"Purchase Orders", desc:"Pesanan/pembelian daripada supplier.", icon:"clipboard", group:"OPERASI",
+    dataKey:"po", autoId:true, idPrefix:"PO-"+new Date().getFullYear(),
+    columns:[
+      {key:"id", label:"No. PO", mono:true},
+      {key:"date", label:"Tarikh", render:r=>fmtDate(r.date)},
+      {key:"supplier", label:"Nama Supplier"},
+      {key:"product", label:"Produk"},
+      {key:"qty", label:"Kuantiti"},
+      {key:"price", label:"Harga Unit", render:r=>moneyCell(r.price)},
+      {key:"total", label:"Jumlah", render:r=>moneyCell(r.qty*r.price)},
+      {key:"deliveryStatus", label:"Status Hantar", render:r=>pill(r.deliveryStatus==="Delivered"?"success":r.deliveryStatus==="Late"?"critical":"neutral", r.deliveryStatus)},
+      {key:"invoiceStatus", label:"Status Invois", render:r=>pill(r.invoiceStatus==="Paid"?"success":r.invoiceStatus==="Invoiced"?"warning":"neutral", r.invoiceStatus)},
+    ],
+    searchKeys:["id","supplier","product","invoiceNo"],
+    formFields:[
+      {key:"supplier", label:"Nama Supplier", type:"select", dynamicSource:"supplierNames", required:true},
+      {key:"date", label:"Tarikh PO", type:"date", default:todayISO()},
+      {key:"product", label:"Produk", type:"text", required:true},
+      {key:"qty", label:"Kuantiti", type:"number"},
+      {key:"price", label:"Harga Unit (RM)", type:"number", step:"0.01"},
+      {key:"expected", label:"Tarikh Hantar Dijangka", type:"date"},
+      {key:"actual", label:"Tarikh Hantar Sebenar", type:"date"},
+      {key:"deliveryStatus", label:"Status Penghantaran", type:"select", options:["Pending","In Transit","Delivered","Late"]},
+      {key:"invoiceNo", label:"No. Invois", type:"text"},
+      {key:"invoiceStatus", label:"Status Invois", type:"select", options:["Not Invoiced","Invoiced","Paid"]},
+    ],
+  },
+  inventory: {
+    label:"Inventory", desc:"Kawalan stok & amaran reorder.", icon:"box", group:"OPERASI",
+    dataKey:"inventory", autoId:true, idPrefix:"SKU",
+    columns:[
+      {key:"id", label:"SKU", mono:true},
+      {key:"product", label:"Nama Produk"},
+      {key:"category", label:"Kategori"},
+      {key:"stock", label:"Stok Semasa"},
+      {key:"reorder", label:"Reorder Level"},
+      {key:"status", label:"Status", render:r=>{const s=invStatus(r); return pill(s.tone,s.label);}},
+      {key:"warehouse", label:"Lokasi Gudang"},
+      {key:"supplier", label:"Supplier Berkaitan"},
+    ],
+    searchKeys:["id","product","category","warehouse","supplier"],
+    formFields:[
+      {key:"product", label:"Nama Produk", type:"text", required:true},
+      {key:"category", label:"Kategori", type:"text"},
+      {key:"unit", label:"Unit", type:"text"},
+      {key:"stock", label:"Stok Semasa", type:"number"},
+      {key:"reorder", label:"Reorder Level", type:"number"},
+      {key:"warehouse", label:"Lokasi Gudang", type:"text"},
+      {key:"updated", label:"Tarikh Kemaskini", type:"date", default:todayISO()},
+      {key:"supplier", label:"Supplier Berkaitan", type:"select", dynamicSource:"supplierNames"},
+    ],
+  },
+  logistics: {
+    label:"Logistics & Delivery", desc:"Jadual & status penghantaran (DO).", icon:"truck", group:"OPERASI",
+    dataKey:"logistics", autoId:true, idPrefix:"DO-"+new Date().getFullYear(),
+    columns:[
+      {key:"id", label:"No. DO", mono:true},
+      {key:"po", label:"No. PO Rujukan", mono:true},
+      {key:"date", label:"Tarikh Hantar", render:r=>fmtDate(r.date)},
+      {key:"vehicle", label:"Kenderaan/Kurier"},
+      {key:"destination", label:"Destinasi"},
+      {key:"status", label:"Status", render:r=>pill(r.status==="Delivered"?"success":r.status==="Delayed"?"critical":"neutral", r.status)},
+      {key:"tracking", label:"No. Tracking", mono:true},
+    ],
+    searchKeys:["id","po","vehicle","destination","tracking"],
+    formFields:[
+      {key:"po", label:"No. PO Rujukan", type:"select", dynamicSource:"poIds"},
+      {key:"date", label:"Tarikh Hantar", type:"date", default:todayISO()},
+      {key:"vehicle", label:"Kenderaan/Kurier", type:"text"},
+      {key:"driver", label:"Contact Driver", type:"text"},
+      {key:"destination", label:"Destinasi", type:"text"},
+      {key:"status", label:"Status", type:"select", options:["Scheduled","In Transit","Delivered","Delayed"]},
+      {key:"tracking", label:"No. Tracking", type:"text"},
+      {key:"notes", label:"Catatan", type:"text", full:true},
+    ],
+  },
+  customers: {
+    label:"Customer Master", desc:"Senarai pelanggan/peruncit (B2B).", icon:"user", group:"PELANGGAN",
+    dataKey:"customers", autoId:true, idPrefix:"CUST",
+    columns:[
+      {key:"id", label:"ID", mono:true},
+      {key:"name", label:"Nama Pelanggan"},
+      {key:"contact", label:"Contact Person"},
+      {key:"tier", label:"Price Tier"},
+      {key:"creditLimit", label:"Had Kredit", render:r=>moneyCell(r.creditLimit)},
+      {key:"balance", label:"Baki Tertunggak", render:r=>moneyCell(customerBalance(r.name))},
+      {key:"status", label:"Status", render:r=>pill(r.status==="Active"?"success":"neutral", r.status)},
+    ],
+    searchKeys:["id","name","contact","phone","email","address"],
+    formFields:[
+      {key:"name", label:"Nama Pelanggan", type:"text", required:true, full:true},
+      {key:"contact", label:"Contact Person", type:"text"},
+      {key:"phone", label:"Telefon", type:"text"},
+      {key:"email", label:"Email", type:"text"},
+      {key:"address", label:"Alamat", type:"textarea", full:true},
+      {key:"tier", label:"Price Tier", type:"select", options:["A","B","C"]},
+      {key:"creditLimit", label:"Had Kredit (RM)", type:"number"},
+      {key:"status", label:"Status", type:"select", options:["Active","Inactive"], default:"Active"},
+    ],
+  },
+  salesOrders: {
+    label:"Sales Orders", desc:"Pesanan daripada pelanggan.", icon:"cart", group:"PELANGGAN",
+    dataKey:"salesOrders", autoId:true, idPrefix:"SO-"+new Date().getFullYear(),
+    columns:[
+      {key:"id", label:"No. SO", mono:true},
+      {key:"date", label:"Tarikh", render:r=>fmtDate(r.date)},
+      {key:"customer", label:"Nama Pelanggan"},
+      {key:"product", label:"Produk"},
+      {key:"qty", label:"Kuantiti"},
+      {key:"total", label:"Jumlah", render:r=>moneyCell(r.qty*r.price)},
+      {key:"deliveryStatus", label:"Status Hantar", render:r=>pill(r.deliveryStatus==="Delivered"?"success":r.deliveryStatus==="Late"?"critical":"neutral", r.deliveryStatus)},
+      {key:"invoiceStatus", label:"Status Invois", render:r=>pill(r.invoiceStatus==="Paid"?"success":r.invoiceStatus==="Invoiced"?"warning":"neutral", r.invoiceStatus)},
+    ],
+    searchKeys:["id","customer","product","invoiceNo"],
+    formFields:[
+      {key:"customer", label:"Nama Pelanggan", type:"select", dynamicSource:"customerNames", required:true},
+      {key:"date", label:"Tarikh SO", type:"date", default:todayISO()},
+      {key:"product", label:"Produk", type:"text", required:true},
+      {key:"qty", label:"Kuantiti", type:"number"},
+      {key:"price", label:"Harga Unit (RM)", type:"number", step:"0.01"},
+      {key:"deliveryStatus", label:"Status Penghantaran", type:"select", options:["Pending","In Transit","Delivered","Late"]},
+      {key:"invoiceNo", label:"No. Invois", type:"text"},
+      {key:"invoiceStatus", label:"Status Invois", type:"select", options:["Not Invoiced","Invoiced","Paid"]},
+    ],
+  },
+  ar: {
+    label:"AR — Belum Terima", desc:"Invois daripada pelanggan.", icon:"arrowDown", group:"KEWANGAN",
+    dataKey:"ar", autoId:false, idLabel:"No. Invois",
+    columns:[
+      {key:"id", label:"No. Invois", mono:true},
+      {key:"customer", label:"Nama Pelanggan"},
+      {key:"invoiceDate", label:"Tarikh Invois", render:r=>fmtDate(r.invoiceDate)},
+      {key:"dueDate", label:"Tarikh Cukup Tempoh", render:r=>fmtDate(r.dueDate)},
+      {key:"amount", label:"Amaun", render:r=>moneyCell(r.amount)},
+      {key:"balance", label:"Baki", render:r=>moneyCell(invoiceAging(r).balance)},
+      {key:"status", label:"Status", render:r=>{const a=invoiceAging(r); return pill(a.tone,a.label+(a.overdue?` (${a.overdue}h)`:""));}},
+    ],
+    searchKeys:["id","customer"],
+    formFields:[
+      {key:"id", label:"No. Invois", type:"text", required:true},
+      {key:"customer", label:"Nama Pelanggan", type:"select", dynamicSource:"customerNames", required:true},
+      {key:"invoiceDate", label:"Tarikh Invois", type:"date", default:todayISO()},
+      {key:"dueDate", label:"Tarikh Cukup Tempoh", type:"date"},
+      {key:"amount", label:"Amaun (RM)", type:"number", step:"0.01"},
+      {key:"paid", label:"Amaun Dibayar (RM)", type:"number", step:"0.01", default:0},
+    ],
+  },
+  ap: {
+    label:"AP — Belum Bayar", desc:"Invois kepada supplier.", icon:"arrowUp", group:"KEWANGAN",
+    dataKey:"ap", autoId:false, idLabel:"No. Invois",
+    columns:[
+      {key:"id", label:"No. Invois", mono:true},
+      {key:"supplier", label:"Nama Supplier"},
+      {key:"invoiceDate", label:"Tarikh Invois", render:r=>fmtDate(r.invoiceDate)},
+      {key:"dueDate", label:"Tarikh Cukup Tempoh", render:r=>fmtDate(r.dueDate)},
+      {key:"amount", label:"Amaun", render:r=>moneyCell(r.amount)},
+      {key:"balance", label:"Baki", render:r=>moneyCell(invoiceAging(r).balance)},
+      {key:"status", label:"Status", render:r=>{const a=invoiceAging(r); return pill(a.tone,a.label+(a.overdue?` (${a.overdue}h)`:""));}},
+    ],
+    searchKeys:["id","supplier"],
+    formFields:[
+      {key:"id", label:"No. Invois", type:"text", required:true},
+      {key:"supplier", label:"Nama Supplier", type:"select", dynamicSource:"supplierNames", required:true},
+      {key:"invoiceDate", label:"Tarikh Invois", type:"date", default:todayISO()},
+      {key:"dueDate", label:"Tarikh Cukup Tempoh", type:"date"},
+      {key:"amount", label:"Amaun (RM)", type:"number", step:"0.01"},
+      {key:"paid", label:"Amaun Dibayar (RM)", type:"number", step:"0.01", default:0},
+    ],
+  },
+};
+
+const NAV_ORDER = [
+  {key:"dashboard", label:"Dashboard", icon:"dashboard", group:"UTAMA"},
+  {key:"suppliers"}, {key:"priceList"}, {key:"agreements"}, {key:"kpi"},
+  {key:"lookup", label:"Profil Supplier 360°", icon:"search360", group:"SUPPLIER"},
+  {key:"po"}, {key:"inventory"}, {key:"logistics"},
+  {key:"customers"}, {key:"salesOrders"},
+  {key:"ar"}, {key:"ap"},
+  {key:"pl", label:"Untung Rugi (P&L)", icon:"chart", group:"KEWANGAN"},
+  {key:"search", label:"Carian Global", icon:"globe", group:"CARIAN"},
+  {key:"devnotes", label:"Nota Developer", icon:"code", group:"CARIAN"},
+];
+</script>
+<script>
+/* ---------------- Navigation ---------------- */
+let currentPage = "dashboard";
+let tableFilters = {}; // moduleKey -> search string
+
+function buildNav(){
+  const groups = {};
+  NAV_ORDER.forEach(item=>{
+    const cfg = MODULES[item.key];
+    const label = item.label || (cfg && cfg.label);
+    const icon = item.icon || (cfg && cfg.icon);
+    const group = item.group || (cfg && cfg.group) || "LAIN";
+    if(!groups[group]) groups[group] = [];
+    groups[group].push({key:item.key, label, icon});
+  });
+  const order = ["UTAMA","SUPPLIER","OPERASI","PELANGGAN","KEWANGAN","CARIAN"];
+  const labelMap = {UTAMA:"Utama", SUPPLIER:"Supplier", OPERASI:"Operasi", PELANGGAN:"Pelanggan", KEWANGAN:"Kewangan", CARIAN:"Carian & Rujukan"};
+  let html = "";
+  order.filter(g=>groups[g]).forEach(g=>{
+    html += `<div class="nav-group"><div class="nav-label">${labelMap[g]}</div>`;
+    groups[g].forEach(it=>{
+      html += `<button type="button" class="nav-item" data-page="${it.key}">${icon(it.icon)}<span>${it.label}</span></button>`;
+    });
+    html += `</div>`;
+  });
+  document.getElementById("navScroll").innerHTML = html;
+  document.querySelectorAll(".nav-item").forEach(btn=>{
+    btn.addEventListener("click", ()=>goTo(btn.dataset.page));
+  });
+}
+
+function goTo(pageKey, opt){
+  currentPage = pageKey;
+  document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active", b.dataset.page===pageKey));
+  const nav = NAV_ORDER.find(n=>n.key===pageKey);
+  const cfg = MODULES[pageKey];
+  document.getElementById("pageTitle").textContent = (nav && nav.label) || (cfg && cfg.label) || "";
+  document.getElementById("pageSubtitle").textContent = (cfg && cfg.desc) || pageSubtitleFor(pageKey);
+  renderPage(pageKey, opt);
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("content").scrollTop = 0;
+}
+function pageSubtitleFor(key){
+  return {
+    dashboard:"Ringkasan operasi & amaran hari ini",
+    lookup:"Pilih 1 supplier — semua maklumat keluar sekali gus",
+    search:"Cari merentasi supplier, PO, produk & agreement",
+    pl:"Untung rugi automatik ikut suku tahun",
+    devnotes:"Spesifikasi ringkas untuk pembangunan sistem sebenar",
+  }[key] || "";
+}
+
+function renderPage(key, opt){
+  const mount = document.getElementById("content");
+  if(key==="dashboard") return mount.innerHTML = renderDashboard();
+  if(key==="lookup") return mount.innerHTML = renderLookup(opt && opt.supplier);
+  if(key==="search") return mount.innerHTML = renderSearch(opt && opt.q);
+  if(key==="pl") return mount.innerHTML = renderPL();
+  if(key==="devnotes") return mount.innerHTML = renderDevNotes();
+  const cfg = MODULES[key];
+  if(!cfg) return;
+  mount.innerHTML = renderModulePage(key, cfg);
+  wireModulePage(key, cfg);
+}
+</script>
+<script>
+/* ---------------- Generic module page (table + CRUD) ---------------- */
+function moduleRows(key, cfg){
+  const q = (tableFilters[key]||"").trim().toLowerCase();
+  let rows = DB[cfg.dataKey];
+  if(q){
+    rows = rows.filter(r => cfg.searchKeys.some(k => String(r[k]??"").toLowerCase().includes(q)));
+  }
+  return rows;
+}
+
+function renderModulePage(key, cfg){
+  const rows = moduleRows(key, cfg);
+  const theadCells = cfg.columns.map(c=>`<th>${c.label}</th>`).join("") + `<th></th>`;
+  const bodyRows = rows.length ? rows.map(r=>{
+    const cells = cfg.columns.map(c=>{
+      const val = c.render ? c.render(r) : escapeHtml(r[c.key]??"—");
+      return `<td class="${c.mono?'mono':''}">${val}</td>`;
+    }).join("");
+    return `<tr data-id="${escapeHtml(r.id)}">${cells}<td><div class="row-actions">
+        <button type="button" class="act-edit" title="Edit">${icon("edit")}</button>
+        <button type="button" class="act-del" title="Padam">${icon("trash")}</button>
+      </div></td></tr>`;
+  }).join("") : `<tr><td colspan="${cfg.columns.length+1}"><div class="empty-state">Tiada rekod dijumpai. Klik "Tambah" untuk mula.</div></td></tr>`;
+
+  return `
+    <div class="page-head">
+      <div><h2>${cfg.label}</h2><p>${cfg.desc}</p></div>
+      <div class="page-actions"><button class="btn btn-primary" id="addBtn">${icon("plus")}Tambah</button></div>
+    </div>
+    <div class="card">
+      <div class="table-toolbar">
+        <div class="table-search">${icon("search360")}<input type="text" id="moduleSearch" placeholder="Cari dalam ${cfg.label.toLowerCase()}..." value="${escapeHtml(tableFilters[key]||"")}"></div>
+        <div class="table-meta">${rows.length} rekod</div>
+      </div>
+      <div class="table-wrap"><table class="data"><thead><tr>${theadCells}</tr></thead><tbody>${bodyRows}</tbody></table></div>
+    </div>`;
+}
+
+function wireModulePage(key, cfg){
+  const searchEl = document.getElementById("moduleSearch");
+  searchEl.addEventListener("input", ()=>{
+    tableFilters[key] = searchEl.value;
+    const pos = searchEl.selectionStart;
+    document.getElementById("content").innerHTML = renderModulePage(key, cfg);
+    wireModulePage(key, cfg);
+    const el = document.getElementById("moduleSearch");
+    el.focus(); el.setSelectionRange(pos,pos);
+  });
+  document.getElementById("addBtn").addEventListener("click", ()=>openModal(key, cfg, null));
+  document.querySelectorAll("tbody .act-edit").forEach(btn=>{
+    btn.addEventListener("click", (e)=>{
+      const id = e.target.closest("tr").dataset.id;
+      const row = DB[cfg.dataKey].find(r=>String(r.id)===id);
+      openModal(key, cfg, row);
+    });
+  });
+  document.querySelectorAll("tbody .act-del").forEach(btn=>{
+    btn.addEventListener("click", (e)=>{
+      const id = e.target.closest("tr").dataset.id;
+      if(!confirm("Padam rekod "+id+"? Tindakan ini tidak boleh dibatalkan.")) return;
+      DB[cfg.dataKey] = DB[cfg.dataKey].filter(r=>String(r.id)!==id);
+      saveDB();
+      goTo(key);
+      toast("Rekod "+id+" dipadam.");
+    });
+  });
+}
+
+/* ---------------- Modal (add/edit) ---------------- */
+let modalCtx = null;
+function openModal(moduleKey, cfg, row){
+  modalCtx = {moduleKey, cfg, editingId: row?row.id:null};
+  document.getElementById("modalTitle").textContent = (row?"Edit ":"Tambah ") + cfg.label;
+  const fields = cfg.formFields.map(f=>{
+    const val = row ? row[f.key] : (f.default!==undefined ? f.default : "");
+    const fullCls = f.full ? "full" : "";
+    let input;
+    if(f.type==="select" || f.type==="select-dynamic" || f.dynamicSource){
+      const opts = f.dynamicSource ? DYNAMIC_SOURCES[f.dynamicSource]() : f.options;
+      input = `<select name="${f.key}" ${f.required?"required":""}>` +
+        `<option value="">— pilih —</option>` +
+        opts.map(o=>`<option value="${escapeHtml(o)}" ${String(val)===String(o)?"selected":""}>${escapeHtml(o)}</option>`).join("") +
+        `</select>`;
+    } else if(f.type==="textarea"){
+      input = `<textarea name="${f.key}" ${f.required?"required":""}>${escapeHtml(val)}</textarea>`;
+    } else {
+      const extra = f.type==="number" ? `step="${f.step||"1"}" ${f.min!==undefined?`min="${f.min}"`:""} ${f.max!==undefined?`max="${f.max}"`:""}` : "";
+      input = `<input type="${f.type}" name="${f.key}" value="${escapeHtml(val)}" ${extra} ${f.required?"required":""}>`;
+    }
+    return `<div class="field ${fullCls}"><label>${f.label}${f.required?" *":""}</label>${input}${f.hint?`<div class="section-sub" style="padding:4px 0 0">${f.hint}</div>`:""}</div>`;
+  }).join("");
+
+  const idNote = cfg.autoId
+    ? `<div class="field full"><label>ID (auto-jana)</label><input type="text" disabled value="${row?row.id:'— dijana bila disimpan —'}" style="color:var(--text-faint)"></div>`
+    : "";
+  document.getElementById("modalBody").innerHTML = idNote + fields;
+  document.getElementById("modalOverlay").classList.add("open");
+  document.getElementById("modalBody").querySelector("input,select,textarea")?.focus();
+}
+function closeModal(){
+  document.getElementById("modalOverlay").classList.remove("open");
+  modalCtx = null;
+}
+document.getElementById("modalClose").addEventListener("click", closeModal);
+document.getElementById("modalCancel").addEventListener("click", closeModal);
+document.getElementById("modalOverlay").addEventListener("click", (e)=>{ if(e.target.id==="modalOverlay") closeModal(); });
+document.addEventListener("keydown", (e)=>{ if(e.key==="Escape") closeModal(); });
+
+document.getElementById("modalForm").addEventListener("submit", (e)=>{
+  e.preventDefault();
+  if(!modalCtx) return;
+  const {moduleKey, cfg, editingId} = modalCtx;
+  const fd = new FormData(e.target);
+  const rec = editingId ? {...DB[cfg.dataKey].find(r=>String(r.id)===String(editingId))} : {};
+  cfg.formFields.forEach(f=>{
+    let v = fd.get(f.key);
+    if(f.type==="number") v = v===""? "" : Number(v);
+    rec[f.key] = v;
+  });
+  if(!editingId){
+    if(cfg.autoId){ rec.id = uid(cfg.idPrefix, DB[cfg.dataKey], cfg.idPrefix.length>6?3:3); }
+    DB[cfg.dataKey].push(rec);
+  } else {
+    const idx = DB[cfg.dataKey].findIndex(r=>String(r.id)===String(editingId));
+    DB[cfg.dataKey][idx] = rec;
+  }
+  saveDB();
+  closeModal();
+  goTo(moduleKey);
+  toast((editingId?"Rekod dikemaskini: ":"Rekod ditambah: ")+rec.id);
+});
+</script>
+<script>
+/* ---------------- Dashboard ---------------- */
+function demoBanner(){
+  return `<div class="banner" id="demoBanner">
+    ${icon("box")}
+    <div><strong>Prototaip.</strong> Data di bawah adalah data contoh untuk tunjuk reka bentuk &amp; fungsi (rating automatik, carian, lookup). Sistem produksi sebenar perlu backend + database — lihat halaman "Nota Developer" untuk spesifikasi ringkas.</div>
+    <button type="button" id="demoBannerClose" aria-label="Tutup">&times;</button>
+  </div>`;
+}
+
+function renderDashboard(){
+  const suppliers = DB.suppliers;
+  const counts = {"Strategic / Preferred":0,"Approved":0,"Conditional":0,"At Risk":0,"Poor / Disqualified":0,"Belum Dinilai":0};
+  suppliers.forEach(s=>{ const r = supplierRating(s.name); counts[r.label] = (counts[r.label]||0)+1; });
+
+  const lowStock = DB.inventory.filter(i=>invStatus(i).label!=="OK").length;
+  const arOverdue = DB.ar.filter(r=>invoiceAging(r).label==="Overdue").length;
+  const apOverdue = DB.ap.filter(r=>invoiceAging(r).label==="Overdue").length;
+  const expiring = DB.agreements.filter(a=>agreementStatus(a).label==="Expiring Soon").length;
+  const expired = DB.agreements.filter(a=>agreementStatus(a).label==="Expired").length;
+
+  const totalPurchase = DB.po.reduce((s,p)=>s+p.qty*p.price,0);
+  const totalSales = DB.salesOrders.reduce((s,o)=>s+o.qty*o.price,0);
+  const activeSuppliers = suppliers.filter(s=>s.status==="Active").length;
+
+  const tiles = [
+    {label:"Supplier Aktif", value:activeSuppliers, foot:suppliers.length+" jumlah supplier"},
+    {label:"Jumlah Pembelian", value:fmtMoney(totalPurchase), foot:DB.po.length+" purchase order"},
+    {label:"Jumlah Jualan", value:fmtMoney(totalSales), foot:DB.salesOrders.length+" sales order"},
+    {label:"Item Stok Rendah", value:lowStock, foot:"daripada "+DB.inventory.length+" SKU", tone:lowStock?"critical":"success"},
+  ];
+
+  const statusRows = [
+    ["Strategic / Preferred","success"], ["Approved","success"], ["Conditional","warning"],
+    ["At Risk","warning"], ["Poor / Disqualified","critical"], ["Belum Dinilai","neutral"],
+  ].map(([label,tone])=>`<div class="alert-row"><span class="alert-dot" style="background:var(--${tone==='neutral'?'text-faint':tone})"></span>${label}<span class="alert-count">${counts[label]||0}</span></div>`).join("");
+
+  const warnRows = [
+    ["Item stok rendah (reorder)", lowStock, lowStock?"critical":"success"],
+    ["Invois pelanggan tertunggak (overdue)", arOverdue, arOverdue?"critical":"success"],
+    ["Invois supplier tertunggak (overdue)", apOverdue, apOverdue?"critical":"success"],
+    ["Agreement akan tamat", expiring, expiring?"warning":"success"],
+    ["Agreement sudah tamat", expired, expired?"critical":"success"],
+  ].map(([label,val,tone])=>`<div class="alert-row"><span class="alert-dot" style="background:var(--${tone})"></span>${label}<span class="alert-count">${val}</span></div>`).join("");
+
+  return `
+    ${demoBanner()}
+    <div class="tiles">
+      ${tiles.map(t=>`<div class="tile"><div class="tile-label">${t.label}</div><div class="tile-value" style="${t.tone?`color:var(--${t.tone})`:""}">${t.value}</div><div class="tile-foot">${t.foot}</div></div>`).join("")}
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="section-title">Status Supplier (klasifikasi KPI terkini)</div>
+        <div class="section-sub">Dikira automatik daripada Supplier KPI Scoring, suku tahun terkini bagi setiap supplier.</div>
+        ${statusRows}
+      </div>
+      <div class="card">
+        <div class="section-title">Amaran Operasi</div>
+        <div class="section-sub">Perlu tindakan tidak lama lagi.</div>
+        ${warnRows}
+      </div>
+    </div>`;
+}
+</script>
+<script>
+/* ---------------- Supplier Lookup (360) ---------------- */
+let lookupSelected = null;
+function renderLookup(preselect){
+  if(preselect) lookupSelected = preselect;
+  if(!lookupSelected || !DB.suppliers.some(s=>s.name===lookupSelected)){
+    lookupSelected = DB.suppliers[0] ? DB.suppliers[0].name : null;
+  }
+  const options = DB.suppliers.map(s=>`<option value="${escapeHtml(s.name)}" ${s.name===lookupSelected?"selected":""}>${escapeHtml(s.name)}</option>`).join("");
+
+  if(!lookupSelected){
+    return `<div class="page-head"><div><h2>Profil Supplier 360°</h2></div></div><div class="card card-pad">Tiada supplier lagi. Tambah di Supplier Master dahulu.</div>`;
+  }
+  const s = DB.suppliers.find(x=>x.name===lookupSelected);
+  const rating = supplierRating(s.name);
+  const stats = supplierStats(s.name);
+  const products = DB.priceList.filter(p=>p.supplier===s.name);
+  const agrs = DB.agreements.filter(a=>a.supplier===s.name);
+  const history = supplierPOs(s.name);
+
+  const ringColor = rating.pct==null ? "var(--text-faint)" : `var(--${rating.tone})`;
+  const ringPct = rating.pct==null ? 0 : Math.round(rating.pct*100);
+  const initials = s.name.split(" ").slice(0,2).map(w=>w[0]).join("").toUpperCase();
+
+  const scoreBlocks = rating.pct==null ? `<div class="empty-state">Belum ada penilaian KPI untuk supplier ini.</div>` : (()=>{
+    const k = latestKpiFor(s.name);
+    const items = [["Quality","25%",k.quality],["Delivery","20%",k.delivery],["Cost","15%",k.cost],
+                   ["Service","15%",k.service],["Compliance","15%",k.compliance],["Reliability","10%",k.reliability]];
+    return `<div class="score-grid">${items.map(([l,w,v])=>`<div class="score-item"><div class="lbl">${l} <span class="wt">(${w})</span></div><div class="val">${v}/5</div></div>`).join("")}</div>`;
+  })();
+
+  const prodRows = products.length ? products.map(p=>`<tr><td>${escapeHtml(p.product)}</td><td>${escapeHtml(p.unit)}</td><td>${moneyCell(p.price)}</td><td>${p.moq}</td><td>${p.leadTime} hari</td><td>${p.maxCap}</td></tr>`).join("")
+    : `<tr><td colspan="6"><div class="empty-state">Tiada produk direkodkan.</div></td></tr>`;
+
+  const agrRows = agrs.length ? agrs.map(a=>{const st=agreementStatus(a); return `<tr><td class="mono">${a.id}</td><td>${escapeHtml(a.type)}</td><td>${fmtDate(a.start)}</td><td>${fmtDate(a.end)}</td><td>${pill(st.tone,st.label)}</td><td>${a.link?`<a href="${escapeHtml(a.link)}" target="_blank" rel="noopener">Buka ↗</a>`:'—'}</td></tr>`;}).join("")
+    : `<tr><td colspan="6"><div class="empty-state">Tiada agreement direkodkan.</div></td></tr>`;
+
+  const histRows = history.length ? history.map(p=>`<tr><td class="mono">${p.id}</td><td>${fmtDate(p.date)}</td><td>${escapeHtml(p.product)}</td><td>${p.qty}</td><td>${moneyCell(p.price)}</td><td>${moneyCell(p.qty*p.price)}</td><td>${pill(p.deliveryStatus==="Delivered"?"success":"neutral", p.deliveryStatus)}</td></tr>`).join("")
+    : `<tr><td colspan="7"><div class="empty-state">Tiada sejarah pembelian.</div></td></tr>`;
+
+  return `
+    <div class="lookup-head">
+      <select id="lookupSelect">${options}</select>
+      <span class="section-sub" style="padding:0">Semua maklumat di bawah kemas kini automatik ikut supplier dipilih.</span>
+    </div>
+    <div class="grid-2">
+      <div class="card card-pad">
+        <div class="profile-card">
+          <div class="avatar">${initials}</div>
+          <div style="flex:1">
+            <h3 style="font-size:16px">${escapeHtml(s.name)}</h3>
+            <div class="section-sub" style="padding:2px 0 0">${escapeHtml(s.category)} · ${pill(s.status==="Active"?"success":"neutral", s.status)}</div>
+          </div>
+        </div>
+        <div class="kv-list">
+          <div class="kv"><span class="k">ID Supplier</span><span class="v mono">${s.id}</span></div>
+          <div class="kv"><span class="k">Tarikh Onboard</span><span class="v">${fmtDate(s.onboarded)}</span></div>
+          <div class="kv"><span class="k">Contact Person</span><span class="v">${escapeHtml(s.contact)}</span></div>
+          <div class="kv"><span class="k">Telefon</span><span class="v mono">${escapeHtml(s.phone)}</span></div>
+          <div class="kv"><span class="k">Email</span><span class="v">${escapeHtml(s.email)}</span></div>
+          <div class="kv"><span class="k">Alamat</span><span class="v">${escapeHtml(s.address)}</span></div>
+        </div>
+      </div>
+      <div class="card card-pad">
+        <div class="rating-hero">
+          <div class="rating-ring" style="background:color-mix(in srgb, ${ringColor} 16%, transparent); color:${ringColor}; border:2px solid ${ringColor}">${rating.pct==null?"—":ringPct+"%"}</div>
+          <div>
+            <div style="font-weight:600;font-size:14.5px">${rating.label}</div>
+            <div class="section-sub" style="padding:2px 0 0">Tempoh: ${rating.period||"—"} · Tindakan: ${rating.action}</div>
+          </div>
+        </div>
+        ${scoreBlocks}
+      </div>
+    </div>
+
+    <div class="tiles" style="margin-top:18px">
+      <div class="tile"><div class="tile-label">Jumlah Pembelian</div><div class="tile-value">${fmtMoney(stats.total)}</div><div class="tile-foot">${stats.count} transaksi</div></div>
+      <div class="tile"><div class="tile-label">Pembelian Terakhir</div><div class="tile-value" style="font-size:19px">${stats.lastDate?fmtDate(stats.lastDate):"—"}</div><div class="tile-foot">${fmtMoney(stats.lastAmount)}</div></div>
+      <div class="tile"><div class="tile-label">Produk Dibekalkan</div><div class="tile-value">${products.length}</div><div class="tile-foot">jenis produk</div></div>
+      <div class="tile"><div class="tile-label">Agreement Aktif</div><div class="tile-value">${agrs.filter(a=>agreementStatus(a).label==="Active").length}</div><div class="tile-foot">${agrs.length} jumlah agreement</div></div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <div class="section-title">Senarai Produk Dibekalkan</div>
+      <div class="table-wrap"><table class="data"><thead><tr><th>Produk</th><th>Unit</th><th>Harga</th><th>MOQ</th><th>Lead Time</th><th>Kapasiti Maks</th></tr></thead><tbody>${prodRows}</tbody></table></div>
+    </div>
+    <div class="card" style="margin-top:18px">
+      <div class="section-title">Perjanjian (Agreements)</div>
+      <div class="table-wrap"><table class="data"><thead><tr><th>ID</th><th>Jenis</th><th>Mula</th><th>Tamat</th><th>Status</th><th>Fail</th></tr></thead><tbody>${agrRows}</tbody></table></div>
+    </div>
+    <div class="card" style="margin-top:18px">
+      <div class="section-title">Sejarah Pembelian (Purchase History)</div>
+      <div class="table-wrap"><table class="data"><thead><tr><th>No. PO</th><th>Tarikh</th><th>Produk</th><th>Qty</th><th>Harga</th><th>Jumlah</th><th>Status</th></tr></thead><tbody>${histRows}</tbody></table></div>
+    </div>`;
+}
+</script>
+<script>
+/* ---------------- Global Search ---------------- */
+function renderSearch(preQuery){
+  const q = (preQuery!==undefined ? preQuery : (renderSearch._q||"")).trim();
+  renderSearch._q = q;
+  const ql = q.toLowerCase();
+
+  const supMatches = q ? DB.suppliers.filter(s=>[s.id,s.name,s.category,s.contact,s.phone].some(v=>String(v??"").toLowerCase().includes(ql))) : [];
+  const poMatches = q ? DB.po.filter(p=>[p.id,p.supplier,p.product,p.invoiceNo].some(v=>String(v??"").toLowerCase().includes(ql))) : [];
+  const agrMatches = q ? DB.agreements.filter(a=>[a.id,a.supplier,a.type,a.link,a.notes].some(v=>String(v??"").toLowerCase().includes(ql))) : [];
+
+  const supRows = supMatches.map(s=>`<tr><td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.category)}</td><td>${escapeHtml(s.contact)}</td><td>${escapeHtml(s.phone)}</td>
+      <td><button type="button" class="btn btn-secondary go-lookup" data-name="${escapeHtml(s.name)}" style="padding:4px 10px;font-size:12px">Lihat Profil 360°</button></td></tr>`).join("");
+  const poRows = poMatches.map(p=>`<tr><td class="mono">${p.id}</td><td>${fmtDate(p.date)}</td><td>${escapeHtml(p.supplier)}</td><td>${escapeHtml(p.product)}</td><td>${moneyCell(p.qty*p.price)}</td></tr>`).join("");
+  const agrRows = agrMatches.map(a=>{const st=agreementStatus(a); return `<tr><td class="mono">${a.id}</td><td>${escapeHtml(a.supplier)}</td><td>${escapeHtml(a.type)}</td><td>${fmtDate(a.end)}</td><td>${pill(st.tone,st.label)}</td></tr>`;}).join("");
+
+  const block = (title, count, theadHtml, rowsHtml, emptyMsg) => `
+    <div class="card" style="margin-bottom:16px">
+      <div class="section-title">${title} <span class="cell-muted mono">(${count})</span></div>
+      ${count ? `<div class="table-wrap"><table class="data"><thead><tr>${theadHtml}</tr></thead><tbody>${rowsHtml}</tbody></table></div>`
+               : `<div class="empty-state">${emptyMsg}</div>`}
+    </div>`;
+
+  return `
+    <div class="lookup-head">
+      <div class="table-search" style="max-width:420px;flex:none">${icon("search360")}
+        <input type="text" id="globalSearchInput" placeholder="Taip kata kunci (nama supplier, no. PO, produk, agreement...)" value="${escapeHtml(q)}">
+      </div>
+    </div>
+    ${!q ? `<div class="card card-pad empty-state">Taip kata kunci di atas untuk mula carian merentasi Supplier, Purchase Orders &amp; Agreements.</div>` : `
+      ${block("Hasil: Supplier", supMatches.length, "<th>Nama Supplier</th><th>Kategori</th><th>Contact</th><th>Telefon</th><th></th>", supRows, "Tiada supplier sepadan.")}
+      ${block("Hasil: Purchase Orders", poMatches.length, "<th>No. PO</th><th>Tarikh</th><th>Supplier</th><th>Produk</th><th>Jumlah</th>", poRows, "Tiada PO sepadan.")}
+      ${block("Hasil: Agreements", agrMatches.length, "<th>ID</th><th>Supplier</th><th>Jenis</th><th>Tarikh Tamat</th><th>Status</th>", agrRows, "Tiada agreement sepadan.")}
+    `}`;
+}
+
+/* ---------------- P&L Summary ---------------- */
+function renderPL(){
+  const quarters = {};
+  DB.salesOrders.forEach(o=>{ const {y,q} = quarterOf(o.date); const k=y+"-Q"+q; (quarters[k]=quarters[k]||{sales:0,purchases:0}).sales += o.qty*o.price; });
+  DB.po.forEach(p=>{ const {y,q} = quarterOf(p.date); const k=y+"-Q"+q; (quarters[k]=quarters[k]||{sales:0,purchases:0}).purchases += p.qty*p.price; });
+  Object.keys(DB.plExpenses).forEach(k=>{ quarters[k]=quarters[k]||{sales:0,purchases:0}; });
+  const keys = Object.keys(quarters).sort();
+  const rows = keys.map(k=>{
+    const [y,q] = k.split("-Q");
+    const key2 = y+"-"+"Q"+q;
+    const expenses = DB.plExpenses[y+"-Q"+q] ?? DB.plExpenses[k] ?? 0;
+    const gp = quarters[k].sales - quarters[k].purchases;
+    const net = gp - expenses;
+    return `<tr><td>${y}</td><td>Q${q}</td><td>${moneyCell(quarters[k].sales)}</td><td>${moneyCell(quarters[k].purchases)}</td><td>${moneyCell(gp)}</td><td>${moneyCell(expenses)}</td><td style="font-weight:600;color:${net>=0?"var(--success)":"var(--critical)"}">${moneyCell(net)}</td></tr>`;
+  }).join("") || `<tr><td colspan="7"><div class="empty-state">Tiada data jualan/pembelian lagi.</div></td></tr>`;
+
+  return `
+    <div class="page-head"><div><h2>Ringkasan Untung Rugi</h2><p>Dikira automatik daripada Sales Orders &amp; Purchase Orders, dikumpul ikut suku tahun. Perbelanjaan lain diambil dari anggaran tetap suku tahun (boleh diselaraskan di backend sebenar).</p></div></div>
+    <div class="card">
+      <div class="table-wrap"><table class="data"><thead><tr><th>Tahun</th><th>Suku</th><th>Jualan</th><th>Pembelian</th><th>Untung Kasar</th><th>Perbelanjaan Lain</th><th>Untung Bersih</th></tr></thead><tbody>${rows}</tbody></table></div>
+    </div>`;
+}
+
+/* ---------------- Developer Notes ---------------- */
+function renderDevNotes(){
+  const entities = [
+    ["suppliers","Supplier Master","id, name, category, contact, phone, email, address, status, onboarded"],
+    ["price_list","Supplier Price List","id, supplier_id (FK), product, unit, price, moq, lead_time_days, max_capacity, remarks"],
+    ["agreements","Supplier Agreements","id, supplier_id (FK), type, start_date, end_date, reminder_days, file_link, notes"],
+    ["kpi_scores","Supplier KPI Scoring","id, supplier_id (FK), year, quarter, quality, delivery, cost, service, compliance, reliability"],
+    ["purchase_orders","Purchase Orders","id, supplier_id (FK), date, product, qty, unit_price, expected_date, actual_date, delivery_status, invoice_no, invoice_status"],
+    ["inventory","Inventory","id (sku), product, category, unit, stock, reorder_level, warehouse, updated_at, supplier_id (FK)"],
+    ["logistics","Logistics/Delivery","id, po_id (FK), date, vehicle, driver, destination, status, tracking_no, notes"],
+    ["customers","Customer Master","id, name, contact, phone, email, address, tier, credit_limit, status"],
+    ["sales_orders","Sales Orders","id, customer_id (FK), date, product, qty, unit_price, delivery_status, invoice_no, invoice_status"],
+    ["ar_invoices","AR (Belum Terima)","id (invoice_no), customer_id (FK), invoice_date, due_date, amount, paid"],
+    ["ap_invoices","AP (Belum Bayar)","id (invoice_no), supplier_id (FK), invoice_date, due_date, amount, paid"],
+  ];
+  const rows = entities.map(([t,l,f])=>`<tr><td class="mono">${t}</td><td>${l}</td><td>${f}</td></tr>`).join("");
+
+  return `
+    <div class="page-head"><div><h2>Nota Developer</h2><p>Spesifikasi ringkas untuk pasukan/tool yang akan bina sistem sebenar daripada prototaip ini.</p></div></div>
+    <div class="card card-pad devnote">
+      <h4>Status prototaip ini</h4>
+      <p>Semua data disimpan di <code>localStorage</code> pelayar sahaja (demo). Tiada backend, tiada multi-user, tiada auth. Logik pengiraan (rating KPI, status agreement, aging invois, carian) berada dalam fungsi JavaScript tulen di bahagian atas fail ini — boleh terus dipindah jadi logik backend (service layer).</p>
+
+      <h4>Cadangan struktur data (setiap baris = 1 jadual)</h4>
+      <table class="schema-table"><thead><tr><th>Jadual</th><th>Sheet asal (Excel)</th><th>Medan utama</th></tr></thead><tbody>${rows}</tbody></table>
+
+      <h4>Formula KPI (kekal sama seperti versi Excel)</h4>
+      <p>Weight: Quality 25% · Delivery 20% · Cost 15% · Service 15% · Compliance 15% · Reliability 10%. Overall Rating % = jumlah (skor × weight) ÷ 5. Klasifikasi: ≥90% Strategic/Preferred, ≥80% Approved, ≥70% Conditional, ≥60% At Risk, &lt;60% Poor/Disqualified. Lihat fungsi <code>kpiScore()</code> dan <code>classify()</code>.</p>
+
+      <h4>Cadangan seni bina sistem sebenar</h4>
+      <p>Backend: REST/GraphQL API (Node.js/Express, atau serupa) + PostgreSQL/MySQL — satu jadual bagi setiap entiti di atas, dengan foreign key ke <code>suppliers</code>/<code>customers</code>. Auth diperlukan untuk multi-user (role: Admin/Staff Gudang/Jualan). Endpoint carian (Global Search &amp; Supplier 360) = query <code>WHERE</code>/<code>JOIN</code> merentasi jadual, bukan helper column macam versi Excel.</p>
+
+      <h4>Import data sedia ada</h4>
+      <p>Jika ada rekod sedia ada (Excel/CSV/PDF), sediakan skrip migrasi satu-kali (contoh: Python + pandas) untuk baca fail sumber dan isi jadual di atas — supaya key-in manual hanya untuk rekod BARU selepas migrasi, bukan seluruh sejarah.</p>
+    </div>`;
+}
+</script>
+<script>
+/* ---------------- Wiring for special pages ---------------- */
+function wireDashboard(){
+  const b = document.getElementById("demoBannerClose");
+  if(b) b.addEventListener("click", ()=>document.getElementById("demoBanner").remove());
+}
+function wireLookup(){
+  const sel = document.getElementById("lookupSelect");
+  if(sel) sel.addEventListener("change", ()=>{ lookupSelected = sel.value; renderPage("lookup"); wireLookup(); });
+}
+function wireSearch(){
+  const input = document.getElementById("globalSearchInput");
+  if(input){
+    input.addEventListener("input", ()=>{
+      const pos = input.selectionStart;
+      document.getElementById("content").innerHTML = renderSearch(input.value);
+      wireSearch();
+      const el = document.getElementById("globalSearchInput");
+      el.focus(); el.setSelectionRange(pos,pos);
+    });
+  }
+  document.querySelectorAll(".go-lookup").forEach(btn=>{
+    btn.addEventListener("click", ()=> goTo("lookup", {supplier: btn.dataset.name}));
+  });
+}
+
+/* patch renderPage to attach wiring for special pages */
+const _renderPage = renderPage;
+renderPage = function(key, opt){
+  _renderPage(key, opt);
+  if(key==="dashboard") wireDashboard();
+  if(key==="lookup") wireLookup();
+  if(key==="search") wireSearch();
+};
+
+/* ---------------- Init ---------------- */
+document.getElementById("resetDemoBtn").addEventListener("click", ()=>{
+  if(!confirm("Reset semua data kembali ke data contoh asal? Sebarang rekod yang awak tambah/edit akan hilang.")) return;
+  DB = seedData();
+  saveDB();
+  lookupSelected = null;
+  tableFilters = {};
+  goTo(currentPage);
+  toast("Data direset ke contoh asal.");
+});
+
+document.getElementById("quickSearch").addEventListener("keydown", (e)=>{
+  if(e.key==="Enter"){
+    const q = e.target.value;
+    e.target.value = "";
+    goTo("search", {q});
+  }
+});
+
+buildNav();
+goTo("dashboard");
+</script>
+
+</body>
+</html>
